@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Admin | WordMatch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"/>
+  <style>body{font-family:'Vazirmatn',sans-serif}</style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-700 text-white">
+<section id="login" class="flex flex-col items-center justify-center h-screen">
+  <h1 class="text-2xl font-bold mb-4">ادمین‌پنل</h1>
+  <input id="pass" type="password" placeholder="پسورد" class="px-4 py-2 rounded text-gray-800 mb-4 w-64"/>
+  <button onclick="checkPass()" class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-500">ورود</button>
+</section>
+
+<section id="panel" class="hidden p-6 max-w-5xl mx-auto">
+  <h2 class="text-xl font-bold mb-4">پنل مدیریت</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white/10 rounded p-4">
+      <h3 class="font-semibold mb-2">لیست کاربران</h3>
+      <div id="users" class="max-h-64 overflow-y-auto space-y-2 text-sm"></div>
+    </div>
+    <div class="bg-white/10 rounded p-4">
+      <h3 class="font-semibold mb-2">افزودن سوال جدید</h3>
+      <input id="qWord" placeholder="کلمه انگلیسی" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <input id="qOpt1" placeholder="گزینه 1 (درست)" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <input id="qOpt2" placeholder="گزینه 2" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <input id="qOpt3" placeholder="گزینه 3" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <input id="qOpt4" placeholder="گزینه 4" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <button onclick="addQuestion()" class="px-4 py-2 bg-teal-600 rounded hover:bg-teal-500">افزودن</button>
+    </div>
+    <div class="bg-white/10 rounded p-4">
+      <h3 class="font-semibold mb-2">تبلیغات</h3>
+      <input id="adImg" placeholder="آدرس تصویر" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <input id="adUrl" placeholder="لینک" class="w-full px-3 py-2 rounded text-gray-800 mb-2"/>
+      <button onclick="addAd()" class="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-500">افزودن بنر</button>
+    </div>
+    <div class="bg-white/10 rounded p-4">
+      <h3 class="font-semibold mb-2">ذخیره دستی db.json</h3>
+      <button onclick="downloadDB()" class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-500">دانلود فایل</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const PASS='1234'; let db={};
+async function loadDB(){
+  const res=await fetch('./db.json'); db=await res.json(); renderUsers();
+}
+function checkPass(){
+  if(document.getElementById('pass').value===PASS){
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('panel').classList.remove('hidden');
+    loadDB();
+  }else alert('پسورد اشتباهه!');
+}
+function renderUsers(){
+  const box=document.getElementById('users'); box.innerHTML='';
+  db.users.forEach((u,i)=>{
+    const d=document.createElement('div'); d.className='flex justify-between items-center bg-white/10 rounded p-2';
+    d.innerHTML=`<span>${u.name} • ${u.city} • سکه: ${u.coins}</span>
+    <button onclick="giveCoin(${i})" class="px-2 py-1 bg-green-600 rounded text-xs">+10 سکه</button>`;
+    box.appendChild(d);
+  });
+}
+async function saveDB(){
+  const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(db,null,2));
+  a.download='db.json'; a.click();
+}
+function giveCoin(i){db.users[i].coins+=10; saveDB(); renderUsers();}
+function addQuestion(){
+  const w=document.getElementById('qWord').value.trim();
+  const o=[document.getElementById('qOpt1').value.trim(),document.getElementById('qOpt2').value.trim(),document.getElementById('qOpt3').value.trim(),document.getElementById('qOpt4').value.trim()];
+  if(!w||o.some(x=>!x))return alert('همه فیلدها رو پر کن!');
+  db.questions.push({q:w,o:o,a:0}); saveDB(); alert('اضافه شد!');
+}
+function addAd(){
+  const img=document.getElementById('adImg').value.trim(),url=document.getElementById('adUrl').value.trim();
+  if(!img||!url)return alert('آدرس تصویر و لینک رو بده!');
+  db.ads.push({img,url}); saveDB(); alert('بنر اضافه شد!');
+}
+function downloadDB(){saveDB();}
+</script>
+</body>
+</html>

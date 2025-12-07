@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <title>واژه‌دوست | WordMatch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet"/>
+  <style>body{font-family:'Vazirmatn',sans-serif}</style>
+  <script src="https://unpkg.com/@tma.js/sdk@1.5.0/dist/index.min.js"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-indigo-800 to-teal-700 min-h-screen text-white">
+
+<!-- ======= LOGIN (TMA) ======= -->
+<section id="loginScreen" class="flex flex-col items-center justify-center h-screen">
+  <img src="https://i.pravatar.cc/120?u=logo" class="w-24 h-24 rounded-full mb-4 shadow"/>
+  <h1 class="text-3xl font-bold">واژه‌دوست</h1>
+  <p class="mt-2 text-sm opacity-80">در حال اتصال به تلگرام ...</p>
+</section>
+
+<!-- ======= CREATE PROFILE ======= -->
+<section id="createProfile" class="hidden p-6 max-w-xl mx-auto">
+  <h2 class="text-xl font-bold mb-4">پروفایلت رو کامل کن</h2>
+  <input id="name" type="text" placeholder="نام و نام‌خانوادگی" class="w-full px-4 py-2 rounded text-gray-800 mb-3"/>
+  <input id="age" type="number" min="18" max="99" placeholder="سن" class="w-full px-4 py-2 rounded text-gray-800 mb-3"/>
+  <input id="city" type="text" placeholder="شهر" class="w-full px-4 py-2 rounded text-gray-800 mb-3"/>
+  <select id="gender" class="w-full px-4 py-2 rounded text-gray-800 mb-3">
+    <option value="">جنسیت</option>
+    <option value="male">پسر</option>
+    <option value="female">دختر</option>
+  </select>
+  <label class="block mb-2 text-sm">عکس پروفایل:</label>
+  <input id="avatar" type="file" accept="image/*" class="mb-4 block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-teal-600 file:text-white hover:file:bg-teal-500"/>
+  <button onclick="saveProfile()" class="w-full bg-purple-600 py-2 rounded shadow hover:bg-purple-500">ثبت و دریافت ۵ سکه</button>
+</section>
+
+<!-- ======= DASHBOARD ======= -->
+<section id="dashboard" class="hidden p-4">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-3">
+      <img id="userAvatar" class="w-12 h-12 rounded-full object-cover"/>
+      <div>
+        <div id="userName" class="font-bold"></div>
+        <div class="text-xs opacity-80"><span id="userCity"></span> • <span id="userAge"></span> سال</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 bg-purple-700 px-3 py-1 rounded-full">
+      <span id="coins">0</span><span class="text-yellow-300">🪙</span>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <button onclick="showUsers()" class="bg-indigo-600 rounded p-4 shadow hover:bg-indigo-500">👥 کاربران</button>
+    <button onclick="showQuiz()" class="bg-teal-600 rounded p-4 shadow hover:bg-teal-500">🎯 مسابقه</button>
+    <button onclick="showChat()" class="bg-pink-600 rounded p-4 shadow hover:bg-pink-500">💬 چت‌ها</button>
+    <button onclick="showStore()" class="bg-yellow-600 rounded p-4 shadow hover:bg-yellow-500">🛒 سکه</button>
+  </div>
+  <!-- AD BANNER -->
+  <div id="adBanner" class="mt-6 mx-auto rounded overflow-hidden shadow-lg w-11/12 h-24 bg-cover bg-center"></div>
+</section>
+
+<!-- ======= USERS LIST ======= -->
+<section id="usersList" class="hidden p-4 max-w-2xl mx-auto">
+  <h2 class="font-bold mb-3">کاربران</h2>
+  <div id="usersContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+  <button onclick="showDashboard()" class="mt-4 text-sm underline">← بازگشت</button>
+</section>
+
+<!-- ======= QUIZ ======= -->
+<section id="quiz" class="hidden p-4 max-w-xl mx-auto">
+  <h2 class="font-bold mb-2">مسابقه لغت</h2>
+  <div class="bg-white/10 rounded p-4">
+    <div class="flex justify-between items-center mb-2"><span id="timer" class="text-lg">۱۵</span><span>جایزه: <span class="text-yellow-300">۱۰</span></span></div>
+    <div id="question" class="text-lg mb-4"></div>
+    <div id="options" class="grid grid-cols-2 gap-3"></div>
+  </div>
+  <button onclick="showDashboard()" class="mt-4 text-sm underline">بازگشت</button>
+</section>
+
+<!-- ======= CHAT ======= -->
+<section id="chat" class="hidden p-4 max-w-xl mx-auto">
+  <h2 class="font-bold mb-2">چت‌ها</h2>
+  <div id="chatList" class="space-y-2 mb-4 max-h-64 overflow-y-auto"></div>
+  <div class="flex gap-2">
+    <input id="chatInput" class="flex-1 px-3 py-2 rounded text-gray-800" placeholder="پیام..."/>
+    <button onclick="sendMsg()" class="px-4 py-2 bg-teal-600 rounded hover:bg-teal-500">ارسال</button>
+  </div>
+  <button onclick="showDashboard()" class="mt-4 text-sm underline">← بازگشت</button>
+</section>
+
+<!-- ======= STORE ======= -->
+<section id="store" class="hidden p-4 max-w-md mx-auto">
+  <h2 class="font-bold mb-4">افزایش سکه</h2>
+  <div class="space-y-3">
+    <div class="bg-white/10 rounded p-3 flex justify-between items-center"><span>۱۰ سکه</span><button onclick="buyCoins(10)" class="px-3 py-1 bg-teal-600 rounded hover:bg-teal-500">۲۰,۰۰۰ ت</button></div>
+    <div class="bg-white/10 rounded p-3 flex justify-between items-center"><span>۵۰ سکه</span><button onclick="buyCoins(50)" class="px-3 py-1 bg-teal-600 rounded hover:bg-teal-500">۸۰,۰۰۰ ت</button></div>
+  </div>
+  <button onclick="showDashboard()" class="mt-4 text-sm underline">بازگشت</button>
+</section>
+
+<script type="module">
+import {init} from 'https://unpkg.com/@tma.js/sdk@1.5.0/dist/index.min.js';
+let tg,data,db={},adList=[];
+async function loadDB(){
+  const res = await fetch('./db.json'); db=await res.json();
+  adList=db.ads||[];
+  rotateAd();
+}
+function rotateAd(){
+  if(!adList.length)return;
+  const ad = adList[Math.floor(Math.random()*adList.length)];
+  gid('adBanner').style.backgroundImage=`url(${ad.img})`;
+  gid('adBanner').onclick=()=>window.open(ad.url,'_blank');
+  setTimeout(rotateAd,30000);
+}
+window.gid=id=>document.getElementById(id);
+window.hideAll=()=>['loginScreen','createProfile','dashboard','usersList','quiz','chat','store'].forEach(s=>gid(s).classList.add('hidden'));
+
+/* ---------- init TMA ---------- */
+init().then(async t=>{
+  tg=t; data=tg.initDataUnsafe.user;
+  await loadDB();
+  const user = db.users.find(u=>u.tgId===data.id);
+  if(!user){ hideAll(); gid('createProfile').classList.remove('hidden');}
+  else{ loadDashboard(user); }
+}).catch(()=>{ alert('لطفا داخل تلگرام باز کن'); });
+
+/* ---------- save profile ---------- */
+window.saveProfile=()=>{
+  const name=gid('name').value.trim(), age=+gid('age').value, city=gid('city').value.trim(), gender=gid('gender').value, file=gid('avatar').files[0];
+  if(!name||!age||!city||!gender)return alert('همه فیلدها رو پر کن!');
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const newUser={tgId:data.id, name, age, city, gender, avatar:e.target.result, coins:5};
+    db.users.push(newUser); saveDB();
+    loadDashboard(newUser);
+  };
+  reader.readAsDataURL(file);
+};
+function saveDB(){ fetch('./save.php',{method:'POST',body:JSON.stringify(db),headers:{'Content-Type':'application/json'}}).catch(()=>{/*local fallback*/}); }
+
+/* ---------- dashboard ---------- */
+function loadDashboard(user){
+  hideAll(); gid('dashboard').classList.remove('hidden');
+  gid('userName').textContent=user.name; gid('userAge').textContent=user.age; gid('userCity').textContent=user.city;
+  gid('userAvatar').src=user.avatar; gid('coins').textContent=user.coins;
+}
+
+/* ---------- users ---------- */
+window.showUsers=()=>{
+  hideAll(); gid('usersList').classList.remove('hidden');
+  const me=db.users.find(u=>u.tgId===data.id);
+  const list=db.users.filter(u=>u.tgId!==me.tgId);
+  const c=gid('usersContainer'); c.innerHTML='';
+  list.forEach(u=>{
+    const div=document.createElement('div'); div.className='bg-white/10 rounded p-3 flex items-center gap-3';
+    div.innerHTML=`
+      <img src="${u.avatar}" class="w-14 h-14 rounded-full object-cover">
+      <div class="flex-1">
+        <div class="font-bold">${u.name}</div>
+        <div class="text-xs opacity-80">${u.city} • ${u.age} سال</div>
+      </div>
+      <button onclick="sendReq(${u.tgId})" class="px-3 py-1 bg-pink-600 rounded hover:bg-pink-500 text-sm">درخواست چت</button>
+    `; c.appendChild(div);
+  });
+};
+window.sendReq=tid=>{
+  const me=db.users.find(u=>u.tgId===data.id);
+  if(me.coins<2)return alert('سکه کافی نیست!');
+  me.coins-=2; saveDB(); loadDashboard(me);
+  const chatId=[data.id,tid].sort().join('_');
+  if(!db.chats[chatId])db.chats[chatId]=[];
+  db.chats[chatId].push({from:data.id,text:`${me.name} درخواست چت فرستاد.`,ts:Date.now()});
+  saveDB(); alert('درخواست ارسال شد!');
+};
+
+/* ---------- quiz ---------- */
+window.showQuiz=()=>{
+  hideAll(); gid('quiz').classList.remove('hidden');
+  const qs=db.questions; const q=qs[Math.floor(Math.random()*qs.length)];
+  gid('question').textContent=`معنی "${q.q}" چیست؟`;
+  const opts=gid('options'); opts.innerHTML='';
+  q.o.forEach((opt,idx)=>{
+    const btn=document.createElement('button'); btn.className='bg-white/20 hover:bg-white/30 rounded p-3'; btn.textContent=opt;
+    btn.onclick=()=>ans(idx,q.a);
+    opts.appendChild(btn);
+  });
+  let t=15; gid('timer').textContent=t;
+  const iv=setInterval(()=>{t--;gid('timer').textContent=t;if(t===0){clearInterval(iv);alert('وقت تموم شد!');showDashboard();}},1000);
+};
+function ans(idx,ans){
+  const me=db.users.find(u=>u.tgId===data.id);
+  if(idx===ans){me.coins+=10;saveDB();loadDashboard(me);alert('آفرین! ۱۰ سکه بردی.');}
+  else alert('اشتباه بود!');
+  showDashboard();
+}
+
+/* ---------- chat ---------- */
+window.showChat=()=>{
+  hideAll(); gid('chat').classList.remove('hidden');
+  renderChat();
+  setInterval(renderChat,5000);
+};
+function renderChat(){
+  const mine=data.id; let html='';
+  Object.keys(db.chats).forEach(cid=>{
+    if(cid.includes(mine)){
+      const msgs=db.chats[cid];
+      msgs.forEach(m=>{
+        const cl=m.from===mine?'text-right':'text-left';
+        html+=`<div class="${cl} bg-white/10 rounded p-2 my-1"><div class="text-xs opacity-70">${m.from===mine?'شما':db.users.find(u=>u.tgId===m.from)?.name}</div>${m.text}</div>`;
+      });
+    }
+  });
+  gid('chatList').innerHTML=html||'هنوز پیامی نیست';
+}
+window.sendMsg=()=>{
+  const txt=gid('chatInput').value.trim(); if(!txt)return;
+  const mine=data.id; let chatId='';
+  Object.keys(db.chats).forEach(cid=>{if(cid.includes(mine))chatId=cid;});
+  if(!chatId){alert('اول باید درخواست چت بفرستی!');return;}
+  db.chats[chatId].push({from:mine,text:txt,ts:Date.now()}); saveDB();
+  gid('chatInput').value=''; renderChat();
+};
+
+/* ---------- store ---------- */
+window.showStore=()=>{hideAll();gid('store').classList.remove('hidden');};
+window.buyCoins=n=>{
+  alert(`درگاه خرید ${n} سکه اینجا باز می‌شه (در واقعیت با زرین‌پال).`);
+};
+
+/* ---------- init ---------- */
+loadDB();
+</script>
+</body>
+</html>
