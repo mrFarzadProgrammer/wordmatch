@@ -55,7 +55,7 @@
     <button onclick="showStore()" class="bg-yellow-600 rounded p-4 shadow hover:bg-yellow-500">🛒 سکه</button>
   </div>
   <!-- AD BANNER -->
-  <div id="adBanner" class="mt-6 mx-auto rounded overflow-hidden shadow-lg w-11/12 h-24 bg-cover bg-center"></div>
+  <!-- <div id="adBanner" class="mt-6 mx-auto rounded overflow-hidden shadow-lg w-11/12 h-24 bg-cover bg-center"></div> -->
 </section>
 
 <!-- ======= USERS LIST ======= -->
@@ -108,8 +108,8 @@ async function loadDB(){
 function rotateAd(){
   if(!adList.length)return;
   const ad = adList[Math.floor(Math.random()*adList.length)];
-  gid('adBanner').style.backgroundImage=`url(${ad.img})`;
-  gid('adBanner').onclick=()=>window.open(ad.url,'_blank');
+//   gid('adBanner').style.backgroundImage=`url(${ad.img})`;
+//   gid('adBanner').onclick=()=>window.open(ad.url,'_blank');
   setTimeout(rotateAd,30000);
 }
 window.gid=id=>document.getElementById(id);
