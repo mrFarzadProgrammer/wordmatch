@@ -8,7 +8,5 @@
     {"q":"Water","o":["آب","آتش","باد","خاک"],"a":0},
     {"q":"Friend","o":["دوست","دشمن","غریبه","برادر"],"a":0}
   ],
-  "ads": [
-    {"img":"https://i.pravatar.cc/600x200?u=ad1","url":"https://t.me/yourchannel"}
-  ]
+  "ads": []
 }
